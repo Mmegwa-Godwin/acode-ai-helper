@@ -14,17 +14,21 @@ function showMessage(message) {
     return;
   }
 
-  if (acodeAPI.toast) {
-    acodeAPI.toast(message);
-    return;
+  const candidateAPIs = [
+    acodeAPI.toast,
+    acodeAPI.alert,
+    acodeAPI.showToast,
+    acodeAPI.showAlert
+  ];
+
+  for (const fn of candidateAPIs) {
+    if (typeof fn === "function") {
+      fn.call(acodeAPI, message);
+      return;
+    }
   }
 
-  if (acodeAPI.alert) {
-    acodeAPI.alert(message);
-    return;
-  }
-
-  if (window && window.alert) {
+  if (typeof window !== "undefined" && typeof window.alert === "function") {
     window.alert(message);
     return;
   }
@@ -35,20 +39,31 @@ function showMessage(message) {
 function getSelectedText() {
   if (!acodeAPI) return "";
 
-  if (acodeAPI.editor && acodeAPI.editor.getSelectedText) {
-    return acodeAPI.editor.getSelectedText();
-  }
+  const possibleTargets = [
+    acodeAPI.editor,
+    acodeAPI,
+    globalThis.editor,
+    globalThis
+  ];
 
-  if (acodeAPI.getSelectedText) {
-    return acodeAPI.getSelectedText();
-  }
+  for (const target of possibleTargets) {
+    if (!target) continue;
 
-  if (acodeAPI.editor && acodeAPI.editor.selection) {
-    return acodeAPI.editor.selection;
-  }
+    const methods = [
+      target.getSelectedText,
+      target.getSelection,
+      target.getSelectionText
+    ];
 
-  if (typeof editor !== "undefined" && editor.getSelectedText) {
-    return editor.getSelectedText();
+    for (const fn of methods) {
+      if (typeof fn === "function") {
+        const result = fn.call(target);
+        if (typeof result === "string") return result;
+      }
+    }
+
+    if (typeof target.selection === "string") return target.selection;
+    if (typeof target.selectedText === "string") return target.selectedText;
   }
 
   return "";
@@ -60,24 +75,29 @@ function insertTextIntoEditor(text) {
     return;
   }
 
-  if (acodeAPI.editor && acodeAPI.editor.insert) {
-    acodeAPI.editor.insert(text);
-    return;
-  }
+  const possibleTargets = [
+    acodeAPI.editor,
+    acodeAPI,
+    globalThis.editor,
+    globalThis
+  ];
 
-  if (acodeAPI.insert) {
-    acodeAPI.insert(text);
-    return;
-  }
+  for (const target of possibleTargets) {
+    if (!target) continue;
 
-  if (acodeAPI.editor && acodeAPI.editor.replaceSelection) {
-    acodeAPI.editor.replaceSelection(text);
-    return;
-  }
+    const methods = [
+      target.insert,
+      target.replaceSelection,
+      target.insertText,
+      target.writeText
+    ];
 
-  if (typeof editor !== "undefined" && editor.insert) {
-    editor.insert(text);
-    return;
+    for (const fn of methods) {
+      if (typeof fn === "function") {
+        fn.call(target, text);
+        return;
+      }
+    }
   }
 
   console.log("[AI Helper] Insert (fallback):", text);
@@ -86,15 +106,21 @@ function insertTextIntoEditor(text) {
 function promptForValue(title, defaultValue = "") {
   if (!acodeAPI) return defaultValue;
 
-  if (acodeAPI.prompt) {
-    return acodeAPI.prompt(title, defaultValue);
+  const candidateAPIs = [
+    acodeAPI.prompt,
+    acodeAPI.showInputDialog,
+    acodeAPI.openPrompt,
+    acodeAPI.input
+  ];
+
+  for (const fn of candidateAPIs) {
+    if (typeof fn === "function") {
+      const result = fn.call(acodeAPI, title, defaultValue);
+      if (result !== undefined) return result;
+    }
   }
 
-  if (acodeAPI.showInputDialog) {
-    return acodeAPI.showInputDialog(title, defaultValue);
-  }
-
-  if (window && window.prompt) {
+  if (typeof window !== "undefined" && typeof window.prompt === "function") {
     return window.prompt(title, defaultValue);
   }
 
@@ -107,25 +133,23 @@ function showOutput(text) {
     return;
   }
 
-  if (acodeAPI.showModal) {
-    acodeAPI.showModal({
-      title: "AI Output",
-      body: text
-    });
-    return;
-  }
+  const candidateAPIs = [
+    acodeAPI.showModal,
+    acodeAPI.dialog,
+    acodeAPI.showOutput,
+    acodeAPI.openDialog,
+    acodeAPI.modal
+  ];
 
-  if (acodeAPI.dialog) {
-    acodeAPI.dialog({
-      title: "AI Output",
-      message: text
-    });
-    return;
-  }
-
-  if (acodeAPI.showOutput) {
-    acodeAPI.showOutput(text);
-    return;
+  for (const fn of candidateAPIs) {
+    if (typeof fn === "function") {
+      fn.call(acodeAPI, {
+        title: "AI Output",
+        body: text,
+        message: text
+      });
+      return;
+    }
   }
 
   console.log("[AI Helper] Output:\n", text);
@@ -137,17 +161,25 @@ function registerCommand(name, callback) {
     return;
   }
 
-  if (acodeAPI.registerCommand) {
-    acodeAPI.registerCommand(name, callback);
-    return;
+  const candidateAPIs = [
+    acodeAPI.registerCommand,
+    acodeAPI.addCommand,
+    acodeAPI.register,
+    acodeAPI.command
+  ];
+
+  for (const fn of candidateAPIs) {
+    if (typeof fn === "function") {
+      fn.call(acodeAPI, name, callback);
+      return;
+    }
   }
 
-  if (acodeAPI.addCommand) {
-    acodeAPI.addCommand(name, callback);
-    return;
-  }
-
-  if (window && window.acodePlugin && window.acodePlugin.registerCommand) {
+  if (
+    typeof window !== "undefined" &&
+    window.acodePlugin &&
+    typeof window.acodePlugin.registerCommand === "function"
+  ) {
     window.acodePlugin.registerCommand(name, callback);
     return;
   }

@@ -1,19 +1,29 @@
 # Acode AI Helper
 
-A lightweight AI helper plugin for Acode that helps developers:
-- explain selected code
-- generate code from a prompt
-- refactor selected code
-- store OpenAI API settings locally
+A mobile-friendly, public-safe starter plugin for Acode that adds lightweight AI assistance directly inside the editor.
 
-## Important notes
+## Features
 
-This project is a starter MVP and a public-safe contribution template. It is intentionally simple and built to be easy to adapt to the exact Acode plugin API that your environment supports.
+- Explain selected code
+- Generate code from a prompt
+- Refactor selected code
+- OpenAI API key configuration
+- Local settings storage
+- Cross-version compatibility wrapper for different Acode mobile builds
 
-### Privacy note
-This plugin sends code or prompts to the OpenAI API. Do not hardcode your API key into the source code. Use a secure local setting flow or a backend proxy for production-grade public release.
+## Why this project exists
 
-## Project structure
+This plugin is designed as a community-friendly utility that helps developers use AI features in Acode without hardcoding API keys or depending on a single Acode API shape.
+
+## Public-safe note
+
+This plugin sends selected code or prompts to the OpenAI API. That means:
+- users must provide their own API key
+- the key should not be baked into the source code
+- you should not expose sensitive data in public repositories
+- for production/public distribution, consider a backend proxy for added safety
+
+## Starter project structure
 
 ```text
 acode-ai-helper/
@@ -21,44 +31,45 @@ acode-ai-helper/
 ├── main.js
 ├── settings.js
 ├── api.js
+├── compat.js
 ├── README.md
-└── .gitignore
+├── LICENSE
+├── .gitignore
+└── package.json
 ```
 
-## Features
+## Quick start
 
-- Explain selected code
-- Generate code from a prompt
-- Refactor selected code
-- Model selection through settings
-- Local storage for API key and model name
+1. Clone the repository.
+2. Add your OpenAI API key in the plugin settings.
+3. Choose a model.
+4. Select code or type a prompt.
+5. Run one of the commands.
 
-## How to use
-
-1. Open the plugin settings.
-2. Add your OpenAI API key.
-3. Choose the model you want to use.
-4. Run one of the plugin commands:
-   - Explain selected code
-   - Generate from prompt
-   - Refactor selected code
-
-## Important implementation note
-
-The file placeholders for:
-- getting selected text
-- inserting text back into the editor
-- popup or modal messages
-- command registration
-
-must be replaced with the actual Acode plugin API in your version of the editor.
-
-## Example command ideas
+## Commands
 
 - ai.explainSelected
 - ai.generatePrompt
 - ai.refactorSelected
 - ai.openSettings
+
+## Compatibility approach
+
+The `compat.js` file isolates all Acode version-specific calls, including:
+- notifications
+- prompts
+- editor text access
+- inserting text
+- command registration
+- output display
+
+This design helps the plugin work across multiple Acode mobile builds.
+
+## Important implementation note
+
+The generic compatibility layer is intentionally designed to be adapted to the exact Acode environment you are targeting. Some Acode versions expose objects like `acode`, `editor`, or `plugin`, while others use slightly different naming.
+
+The project is intended to be a starter for public release, not a strict production package out of the box.
 
 ## License
 

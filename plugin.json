@@ -1,0 +1,16 @@
+{
+  "name": "acode-ai-helper",
+  "version": "0.1.0",
+  "main": "main.js",
+  "description": "AI helper for code explanation, generation, and refactoring in Acode",
+  "author": "Mmegwa-Godwin",
+  "license": "MIT",
+  "category": "tools",
+  "keywords": [
+    "acode",
+    "ai",
+    "openai",
+    "code-generation",
+    "productivity"
+  ]
+}
